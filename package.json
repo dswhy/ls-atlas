@@ -1,13 +1,13 @@
 {
-  "name": "react-three-next",
-  "version": "2.0.0",
+  "name": "react-three-next-why",
+  "version": "1.0.0",
   "authors": [
-    "Renaud ROHLINGER <https://twitter.com/onirenaud>"
+    "&why Studio <https://twitter.com/andwhy_studio>"
   ],
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": ">=14"
+    "node": "^18.16.1"
   },
   "scripts": {
     "lint": "next lint --fix --dir app",
@@ -20,13 +20,18 @@
     "@ducanh2912/next-pwa": "^9.4.0",
     "@react-three/drei": "^9.80.2",
     "@react-three/fiber": "^8.13.6",
+    "accept-language": "^3.0.18",
     "glsl-random": "^0.0.5",
+    "i18next": "^23.5.1",
+    "i18next-resources-to-backend": "^1.1.4",
     "next": "^13.4.13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^13.2.2",
     "three": "^0.154.0",
     "three-stdlib": "^2.24.2",
-    "tunnel-rat": "^0.1.2"
+    "tunnel-rat": "^0.1.2",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.13",

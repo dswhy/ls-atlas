@@ -23,7 +23,7 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
-export default function Page() {
+const PageContent = (props) => {
   return (
     <>
       <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
@@ -37,7 +37,7 @@ export default function Page() {
         <div className='w-full text-center md:w-3/5'>
           <View className='flex h-96 w-full flex-col items-center justify-center'>
             <Suspense fallback={null}>
-              <Logo route='/blob' scale={0.6} position={[0, 0, 0]} />
+              <Logo route='/de/blob' scale={0.6} position={[0, 0, 0]} />
               <Common />
             </Suspense>
           </View>
@@ -80,3 +80,5 @@ export default function Page() {
     </>
   )
 }
+
+export default PageContent

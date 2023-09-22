@@ -1,14 +1,20 @@
 import { Layout } from '@/components/dom/Layout'
-import '@/global.css'
+import './global.css'
+import { dir } from 'i18next'
+import { languages } from '@/i18n/settings'
 
 export const metadata = {
-  title: 'Next.js + Three.js',
-  description: 'A minimal starter for Nextjs + React-three-fiber and Threejs.',
+  title: 'Next.js + Three.js + DatoCMS + i18n',
+  description: 'A minimal starter for Nextjs + React-three-fiber and Threejs with DatoCMS and i18n support.',
 }
 
-export default function RootLayout({ children }) {
+export async function generateStaticParams() {
+  return languages.map((lng) => ({ lng }))
+}
+
+export default function RootLayout({ children, params: { locale } }) {
   return (
-    <html lang='en' className='antialiased'>
+    <html lang={locale} dir={dir(locale)} className='antialiased'>
       {/*
         <head /> will contain the components returned by the nearest parent
         head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head

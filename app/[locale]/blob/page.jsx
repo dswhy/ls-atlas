@@ -1,5 +1,8 @@
 'use client'
 
+// Since this is a client page, the translation stuff won't work straight away. However, it's not likely that we will use it since we're using Dato anyway.
+// In any case, here's the link to find more about how to implement it: https://locize.com/blog/next-13-app-dir-i18n/
+
 import dynamic from 'next/dynamic'
 
 const Blob = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Blob), { ssr: false })
@@ -20,7 +23,7 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
-export default function Page() {
+export default function Page({ params: { locale } }) {
   return (
     <>
       <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
