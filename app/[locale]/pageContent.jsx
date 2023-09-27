@@ -23,7 +23,7 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
-const PageContent = (props) => {
+const PageContent = ({ data, ...props }) => {
   return (
     <>
       <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
