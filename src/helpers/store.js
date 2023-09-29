@@ -1,4 +1,4 @@
-import create from 'zustand'
+import { create } from 'zustand'
 import shallow from 'zustand/shallow'
 import { subscribeWithSelector } from 'zustand/middleware'
 
@@ -6,6 +6,7 @@ const useStoreImpl = create(
   subscribeWithSelector((set) => {
     return {
       loaded: true,
+      data: null,
     }
   }),
 )

@@ -2,17 +2,31 @@ import { Layout } from '@/components/dom/Layout'
 import './global.css'
 import { dir } from 'i18next'
 import { languages } from '@/i18n/settings'
-
-export const metadata = {
-  title: 'Next.js + Three.js + DatoCMS + i18n',
-  description: 'A minimal starter for Nextjs + React-three-fiber and Threejs with DatoCMS and i18n support.',
-}
+import { performRequest } from '@/helpers/dato'
+import { DEMO_QUERY } from '@/helpers/queries/queries'
+import { toNextMetadata } from 'react-datocms/seo'
+import { setState } from '@/helpers/store'
 
 export async function generateStaticParams() {
   return languages.map((lng) => ({ lng }))
 }
 
-export default function RootLayout({ children, params: { locale } }) {
+function getPageRequest(locale = 'en') {
+  return {
+    query: DEMO_QUERY,
+    variables: { locale: locale },
+  }
+}
+
+export async function generateMetadata() {
+  const { data } = await performRequest(getPageRequest())
+  return toNextMetadata([...data.site.favicon, ...data.seo.seo])
+}
+
+export default async function RootLayout({ children, params: { locale } }) {
+  const { data } = await performRequest(getPageRequest(locale))
+  if (data) setState({ data: data })
+
   return (
     <html lang={locale} dir={dir(locale)} className='antialiased'>
       {/*

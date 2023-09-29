@@ -5,5 +5,20 @@ export const DEMO_QUERY = gql`
     testModule(locale: $locale) {
       headline
     }
+    site: _site {
+      favicon: faviconMetaTags {
+        attributes
+        content
+        tag
+      }
+      locales
+    }
+    seo {
+      seo: _seoMetaTags {
+        attributes
+        content
+        tag
+      }
+    }
   }
 `
