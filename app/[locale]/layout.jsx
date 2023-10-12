@@ -5,7 +5,6 @@ import { languages } from '@/i18n/settings'
 import { performRequest } from '@/helpers/dato'
 import { DEMO_QUERY } from '@/helpers/queries/queries'
 import { toNextMetadata } from 'react-datocms/seo'
-import { setState } from '@/helpers/store'
 
 export async function generateStaticParams() {
   return languages.map((lng) => ({ lng }))
@@ -23,10 +22,7 @@ export async function generateMetadata() {
   return toNextMetadata([...data.site.favicon, ...data.seo.seo])
 }
 
-export default async function RootLayout({ children, params: { locale } }) {
-  const { data } = await performRequest(getPageRequest(locale))
-  if (data) setState({ data: data })
-
+export default function RootLayout({ children, params: { locale } }) {
   return (
     <html lang={locale} dir={dir(locale)} className='antialiased'>
       {/*

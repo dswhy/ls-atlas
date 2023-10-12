@@ -1,5 +1,6 @@
 'use client'
 
+import { setGlobalVH, updateGlobalVH } from '@/helpers/global'
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
 
@@ -24,6 +25,16 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
 const PageContent = ({ data, ...props }) => {
+  useEffect(() => {
+    // Set variable height for mobile browsers
+    setGlobalVH()
+    window.addEventListener('resize', updateGlobalVH)
+
+    return () => {
+      window.removeEventListener('resize', updateGlobalVH)
+    }
+  }, [])
+
   return (
     <>
       <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
