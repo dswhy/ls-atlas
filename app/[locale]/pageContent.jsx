@@ -1,8 +1,29 @@
 'use client'
 
+import Cable from '@/components/canvas/Cable'
+import { Lights } from '@/components/canvas/Common'
+import Island from '@/components/canvas/Island'
+import Ball from '@/components/canvas/models/Ball'
+import CharacterModel from '@/components/canvas/models/CharacterModel'
+import { Map } from '@/components/canvas/models/Map'
 import { setGlobalVH, updateGlobalVH } from '@/helpers/global'
+import {
+  Box,
+  Circle,
+  Environment,
+  KeyboardControls,
+  OrbitControls,
+  Plane,
+  QuadraticBezierLine,
+  Sphere,
+  useProgress,
+} from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
+import { Physics, RigidBody } from '@react-three/rapier'
+import Ecctrl from 'ecctrl'
 import dynamic from 'next/dynamic'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import * as THREE from 'three'
 
 const Logo = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Logo), { ssr: false })
 const Dog = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Dog), { ssr: false })
@@ -24,6 +45,23 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 })
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 
+/**
+ * Keyboard control preset
+ */
+const keyboardMap = [
+  { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
+  { name: 'backward', keys: ['ArrowDown', 'KeyS'] },
+  { name: 'leftward', keys: ['ArrowLeft', 'KeyA'] },
+  { name: 'rightward', keys: ['ArrowRight', 'KeyD'] },
+  { name: 'jump', keys: ['Space'] },
+  { name: 'run', keys: ['Shift'] },
+]
+
+const islands = [
+  [0, 0, 0],
+  [30, 10, 10],
+  [-30, 10, 10],
+]
 const PageContent = ({ data, ...props }) => {
   useEffect(() => {
     // Set variable height for mobile browsers
@@ -35,59 +73,63 @@ const PageContent = ({ data, ...props }) => {
     }
   }, [])
 
+  const ballRef = useRef()
+  const controlsRef = useRef()
+  const islandsRef = useRef()
+  const [lines, setLines] = useState([])
+
+  const { progress } = useProgress()
+
   return (
     <>
-      <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
-        {/* jumbo */}
-        <div className='flex w-full flex-col items-start justify-center p-12 text-center md:w-2/5 md:text-left'>
-          <p className='w-full uppercase'>Next + React Three Fiber</p>
-          <h1 className='my-4 text-5xl font-bold leading-tight'>{data.testModule.headline}</h1>
-          <p className='mb-8 text-2xl leading-normal'>A minimalist starter for React, React-three-fiber and Threejs.</p>
-        </div>
-
-        <div className='w-full text-center md:w-3/5'>
-          <View className='flex h-96 w-full flex-col items-center justify-center'>
-            <Suspense fallback={null}>
-              <Logo route='/blob' scale={0.6} position={[0, 0, 0]} />
-              <Common />
-            </Suspense>
-          </View>
-        </div>
+      {/* UI */}
+      <div className='pointer-events-none absolute left-0 top-0 z-10 h-fit-height w-full'>
+        <p className='flex w-full items-center justify-center'>Hello there</p>
       </div>
+      {/* Canvas */}
+      <View
+        onPointerDown={(e) => {
+          e.target.requestPointerLock()
+        }}
+        className='absolute left-0 top-0 h-fit-height w-full'
+      >
+        <Environment preset='forest' />
+        <Suspense fallback={null}>
+          <Physics timeStep='vary' debug>
+            {/* --- Character ---  */}
+            <KeyboardControls map={keyboardMap}>
+              <group position={[0, 2, 0]}>
+                <Ecctrl debug>
+                  <CharacterModel />
+                </Ecctrl>
+              </group>
+            </KeyboardControls>
+            {/* --- Props, Map, etc ---  */}
+            <Ball ref={ballRef} controlsRef={controlsRef} />
+            <group ref={islandsRef} name='islands'>
+              {islands.map((island, i) => (
+                <Island key={'island' + i} initPos={island} float={i > 0} />
+              ))}
+            </group>
 
-      <div className='mx-auto flex w-full flex-col flex-wrap items-center p-12 md:flex-row  lg:w-4/5'>
-        {/* first row */}
-        <div className='relative h-48 w-full py-6 sm:w-1/2 md:my-12 md:mb-40'>
-          <h2 className='mb-3 text-3xl font-bold leading-none text-gray-800'>Events are propagated</h2>
-          <p className='mb-8 text-gray-600'>Drag, scroll, pinch, and rotate the canvas to explore the 3D scene.</p>
-        </div>
-        <div className='relative my-12 h-48 w-full py-6 sm:w-1/2 md:mb-40'>
-          <View orbit className='relative h-full  sm:h-48 sm:w-full'>
-            <Suspense fallback={null}>
-              <Dog scale={2} position={[0, -1.6, 0]} rotation={[0.0, -0.3, 0]} />
-              <Common color={'lightpink'} />
-            </Suspense>
-          </View>
-        </div>
-        {/* second row */}
-        <div className='relative my-12 h-48 w-full py-6 sm:w-1/2 md:mb-40'>
-          <View orbit className='relative h-full animate-bounce sm:h-48 sm:w-full'>
-            <Suspense fallback={null}>
-              <Duck route='/blob' scale={2} position={[0, -1.6, 0]} />
-              <Common color={'lightblue'} />
-            </Suspense>
-          </View>
-        </div>
-        <div className='w-full p-6 sm:w-1/2'>
-          <h2 className='mb-3 text-3xl font-bold leading-none text-gray-800'>Dom and 3D are synchronized</h2>
-          <p className='mb-8 text-gray-600'>
-            3D Divs are renderer through the View component. It uses gl.scissor to cut the viewport into segments. You
-            tie a view to a tracking div which then controls the position and bounds of the viewport. This allows you to
-            have multiple views with a single, performant canvas. These views will follow their tracking elements,
-            scroll along, resize, etc.
-          </p>
-        </div>
-      </div>
+            <Lights />
+            {/* <RigidBody type='fixed' colliders='trimesh'>
+                <Map />
+              </RigidBody> */}
+          </Physics>
+          {islands.length > 1 &&
+            islands.map((island, i) => {
+              if (i === 0) return null
+              const prevIsland = islands[i - 1]
+              const midPoint = [
+                (prevIsland[0] + island[0]) / 2,
+                (prevIsland[1] + island[1]) / 2 - 20,
+                (prevIsland[2] + island[2]) / 2,
+              ]
+              // return <Cable key={'cable' + i} start={prevIsland} end={island} />
+            })}
+        </Suspense>
+      </View>
     </>
   )
 }
